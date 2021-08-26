@@ -5,112 +5,131 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import PropTypes     from 'lib/PropTypes';
-import ParseApp      from 'lib/ParseApp';
-import React         from 'react';
-import Sidebar       from 'components/Sidebar/Sidebar.react';
-import styles        from 'dashboard/Dashboard.scss';
+import PropTypes from "lib/PropTypes";
+import ParseApp from "lib/ParseApp";
+import React from "react";
+import Sidebar from "components/Sidebar/Sidebar.react";
+import styles from "dashboard/Dashboard.scss";
 
 export default class DashboardView extends React.Component {
-
   /* A DashboardView renders two pieces: the sidebar, and the app itself */
   render() {
     let sidebarChildren = null;
-    if (typeof this.renderSidebar === 'function') {
+    if (typeof this.renderSidebar === "function") {
       sidebarChildren = this.renderSidebar();
     }
-    let appSlug = (this.context.currentApp ? this.context.currentApp.slug : '');
+    let appSlug = this.context.currentApp ? this.context.currentApp.slug : "";
 
     if (!this.context.currentApp.hasCheckedForMigraton) {
-      this.context.currentApp.getMigrations().promise
-        .then(() => this.forceUpdate(), () => {});
+      this.context.currentApp.getMigrations().promise.then(
+        () => this.forceUpdate(),
+        () => {}
+      );
     }
 
     let features = this.context.currentApp.serverInfo.features;
 
     let coreSubsections = [];
-    if (features.schemas &&
+    if (
+      features.schemas &&
       features.schemas.addField &&
       features.schemas.removeField &&
       features.schemas.addClass &&
-      features.schemas.removeClass) {
+      features.schemas.removeClass
+    ) {
       coreSubsections.push({
-        name: 'Browser',
-        link: '/browser'
+        name: "Browser",
+        link: "/browser"
       });
     }
 
     if (features.cloudCode && features.cloudCode.viewCode) {
       coreSubsections.push({
-        name: 'Cloud Code',
-        link: '/cloud_code'
+        name: "Cloud Code",
+        link: "/cloud_code"
       });
     }
 
     //webhooks requires removal of heroku link code, then it should work.
-    if (features.hooks && features.hooks.create && features.hooks.read && features.hooks.update && features.hooks.delete) {
+    if (
+      features.hooks &&
+      features.hooks.create &&
+      features.hooks.read &&
+      features.hooks.update &&
+      features.hooks.delete
+    ) {
       coreSubsections.push({
-        name: 'Webhooks',
-        link: '/webhooks'
+        name: "Webhooks",
+        link: "/webhooks"
       });
     }
 
     if (features.cloudCode && features.cloudCode.jobs) {
       coreSubsections.push({
-        name: 'Jobs',
-        link: '/jobs'
+        name: "Jobs",
+        link: "/jobs"
       });
     }
 
-    if (features.logs && Object.keys(features.logs).some(key => features.logs[key])) {
+    if (
+      features.logs &&
+      Object.keys(features.logs).some(key => features.logs[key])
+    ) {
       coreSubsections.push({
-        name: 'Logs',
-        link: '/logs'
+        name: "Logs",
+        link: "/logs"
       });
     }
 
-    if (features.globalConfig &&
+    if (
+      features.globalConfig &&
       features.globalConfig.create &&
       features.globalConfig.read &&
       features.globalConfig.update &&
-      features.globalConfig.delete) {
+      features.globalConfig.delete
+    ) {
       coreSubsections.push({
-        name: 'Config',
-        link: '/config'
+        name: "Config",
+        link: "/config"
       });
     }
 
     coreSubsections.push({
-      name: 'API Console',
-      link: '/api_console'
+      name: "API Console",
+      link: "/api_console"
+    });
+
+    coreSubsections.push({
+      name: "Statistics",
+      link: "/stats"
     });
 
     if (this.context.currentApp.migration) {
       coreSubsections.push({
-        name: 'Migration',
-        link: '/migration',
+        name: "Migration",
+        link: "/migration"
       });
     }
     let pushSubsections = [];
 
     if (features.push && features.push.immediatePush) {
       pushSubsections.push({
-        name: 'Send New Push',
-        link: '/push/new'
+        name: "Send New Push",
+        link: "/push/new"
       });
     }
 
     if (features.push && features.push.storedPushData) {
       pushSubsections.push({
-        name: 'Past Pushes',
-        link: '/push/activity'
+        name: "Past Pushes",
+        link: "/push/activity"
       });
     }
 
     if (features.push && features.push.pushAudiences) {
       pushSubsections.push({
-        name: 'Audiences',
-        link: '/push/audiences'
+        name: "Audiences",
+        link: "/push/audiences"
       });
     }
 
@@ -195,64 +214,65 @@ export default class DashboardView extends React.Component {
       });
     }*/
 
-    let appSidebarSections = []
+    let appSidebarSections = [];
 
     if (coreSubsections.length > 0) {
       appSidebarSections.push({
-        name: 'Core',
-        icon: 'core',
-        link: '/browser',
-        subsections: coreSubsections,
+        name: "Core",
+        icon: "core",
+        link: "/browser",
+        subsections: coreSubsections
       });
     }
 
     if (pushSubsections.length > 0) {
       appSidebarSections.push({
-        name: 'Push',
-        icon: 'push-outline',
-        link: '/push',
-        style: {paddingLeft: '16px'},
-        subsections: pushSubsections,
+        name: "Push",
+        icon: "push-outline",
+        link: "/push",
+        style: { paddingLeft: "16px" },
+        subsections: pushSubsections
       });
     }
 
     if (analyticsSidebarSections.length > 0) {
       appSidebarSections.push({
-        name: 'Analytics',
-        icon: 'analytics-outline',
-        link: '/analytics',
+        name: "Analytics",
+        icon: "analytics-outline",
+        link: "/analytics",
         subsections: analyticsSidebarSections
       });
     }
 
     if (settingsSections.length > 0) {
       appSidebarSections.push({
-        name: 'App Settings',
-        icon: 'gear-solid',
-        link: '/settings',
+        name: "App Settings",
+        icon: "gear-solid",
+        link: "/settings",
         subsections: settingsSections
       });
     }
 
     let sidebar = (
-    <Sidebar
-      sections={appSidebarSections}
-      appSelector={true}
-      section={this.section}
-      subsection={this.subsection}
-      prefix={'/apps/' + appSlug}
-      action={this.action}
-      primaryBackgroundColor={this.context.currentApp.primaryBackgroundColor}
-      secondaryBackgroundColor={this.context.currentApp.secondaryBackgroundColor}
+      <Sidebar
+        sections={appSidebarSections}
+        appSelector={true}
+        section={this.section}
+        subsection={this.subsection}
+        prefix={"/apps/" + appSlug}
+        action={this.action}
+        primaryBackgroundColor={this.context.currentApp.primaryBackgroundColor}
+        secondaryBackgroundColor={
+          this.context.currentApp.secondaryBackgroundColor
+        }
       >
-      {sidebarChildren}
-    </Sidebar>);
+        {sidebarChildren}
+      </Sidebar>
+    );
 
     return (
       <div className={styles.dashboard}>
-        <div className={styles.content}>
-          {this.renderContent()}
-        </div>
+        <div className={styles.content}>{this.renderContent()}</div>
         {sidebar}
       </div>
     );
