@@ -1,13 +1,16 @@
 {
   "apps": [
     {
-      "serverURL": "http://localhost:1338/parse",
-      "appId": "hello",
-      "masterKey": "world",
-      "appName": "",
-      "iconName": "",
-      "primaryBackgroundColor": "",
-      "secondaryBackgroundColor": ""
+      "serverURL": "http://stag.api.viefam.com/",
+      "appId": "BB9g19IqMALbe5t0ofm57hjosci4LUlAsnBueY5m",
+      "masterKey": "IUhgDIsI7wPF69ZrVqh4q5lIjTgBEpyNBxU3TiSg",
+      "appName": "stag-viefam"
+    },
+    {
+      "serverURL": "https://api.viefam.com/",
+      "appId": "FcpgYJsb89Tid8YgBmwaWeZvnmamBfym0oHarD7q",
+      "masterKey": "PFdQKGowmOY0sHoznIX5e8QMeIzMKitqgD2NJDKm",
+      "appName": "viefam"
     }
   ],
   "iconsFolder": "icons"

@@ -3,6 +3,7 @@ import Field from "components/Field/Field.react";
 import Fieldset from "components/Fieldset/Fieldset.react";
 import Label from "components/Label/Label.react";
 import TextInput from "components/TextInput/TextInput.react";
+import Button from "components/Button/Button.react";
 import styles from "dashboard/Data/Stats/Stats.scss";
 import Parse from "parse";
 
@@ -97,6 +98,10 @@ export default class UserStats extends Component {
       );
   }
 
+  filterRealuser(user) {
+    return VN_PHONE_NUMBER_REGEX.test(user.get("username"));
+  }
+
   render() {
     const {
       users,
@@ -106,14 +111,11 @@ export default class UserStats extends Component {
       plantHaveDiary
     } = this.state;
 
-    const realUsers = users.filter(user =>
-      VN_PHONE_NUMBER_REGEX.test(user.get("username"))
-    );
+    const realUsers = users.filter(user => this.filterRealuser(user));
 
     const realUserHavePlants = userHavePlants.filter(u =>
       realUsers.find(r => r.id === u.objectId)
     );
-
     const usersHaveNoPlant = realUsers.filter(
       u => !realUserHavePlants.find(p => p.objectId === u.id)
     );
@@ -121,7 +123,6 @@ export default class UserStats extends Component {
     const realUserHaveOwnerships = userHaveOwnerships.filter(u =>
       realUsers.find(r => r.id === u.objectId)
     );
-
     const realUserNoOwnerships = realUsers.filter(
       u => !realUserHaveOwnerships.find(r => r.objectId === u.id)
     );
@@ -129,7 +130,6 @@ export default class UserStats extends Component {
     const realUserHaveFarms = userHaveFarms.filter(u =>
       realUsers.find(r => r.id === u.objectId)
     );
-
     const realUsersLogDiaries = plantHaveDiary
       .filter(p =>
         VN_PHONE_NUMBER_REGEX.test(
@@ -147,55 +147,72 @@ export default class UserStats extends Component {
     );
 
     return (
-      <div style={{ padding: "120px 0 60px 0" }}>
+      <div style={{ padding: "30px 0 60px 0" }}>
         <Fieldset legend="User Insight" description="Excluding testing users">
           <Field
             label={<Label text="Total users" />}
-            input={<TextInput value={realUsers.length} disabled="true" />}
+            input={<Button value={realUsers.length.toString()} color="blue" />}
           ></Field>
           <Field
             label={<Label text="Users have at least one farm" />}
             input={
-              <TextInput value={realUserHaveFarms.length} disabled="true" />
+              <Button
+                value={realUserHaveFarms.length.toString()}
+                color="blue"
+              />
             }
           ></Field>
           <Field
             label={<Label text="Users have created at least one plant" />}
             input={
-              <TextInput value={realUserHavePlants.length} disabled="true" />
+              <Button
+                value={realUserHavePlants.length.toString()}
+                color="blue"
+              />
             }
           ></Field>
           <Field
             label={<Label text="Users have never created any plant" />}
             input={
-              <TextInput value={usersHaveNoPlant.length} disabled="true" />
+              <Button value={usersHaveNoPlant.length.toString()} color="blue" />
             }
           ></Field>
           <Field
             label={<Label text="Users have at least one ownership" />}
             input={
-              <TextInput
-                value={realUserHaveOwnerships.length}
-                disabled="true"
+              <Button
+                value={realUserHaveOwnerships.length.toString()}
+                color="blue"
               />
             }
           ></Field>
           <Field
-            label={<Label text="Users have no ownership" />}
+            label={
+              <Label text="Users have never been assigned any ownership" />
+            }
             input={
-              <TextInput value={realUserNoOwnerships.length} disabled="true" />
+              <Button
+                value={realUserNoOwnerships.length.toString()}
+                color="blue"
+              />
             }
           ></Field>
           <Field
             label={<Label text="Users have logged at least one diary" />}
             input={
-              <TextInput value={uniqUsersLogDiaries.length} disabled="true" />
+              <Button
+                value={uniqUsersLogDiaries.length.toString()}
+                color="blue"
+              />
             }
           ></Field>
           <Field
             label={<Label text="Users have never logged any diary" />}
             input={
-              <TextInput value={usersNoLogDiaries.length} disabled="true" />
+              <Button
+                value={usersNoLogDiaries.length.toString()}
+                color="blue"
+              />
             }
           ></Field>
         </Fieldset>

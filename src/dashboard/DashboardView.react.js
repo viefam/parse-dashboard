@@ -37,10 +37,10 @@ export default class DashboardView extends React.Component {
       features.schemas.addClass &&
       features.schemas.removeClass
     ) {
-      coreSubsections.push({
-        name: "Browser",
-        link: "/browser"
-      });
+      // coreSubsections.push({
+      //   name: "Browser",
+      //   link: "/browser"
+      // });
     }
 
     if (features.cloudCode && features.cloudCode.viewCode) {
