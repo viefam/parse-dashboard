@@ -16,10 +16,12 @@ export default class UserStats extends Component {
     this.state = {
       response: { results: [] },
       users: [],
-      userHavePlants: [],
-      userHaveOwnerships: [],
-      userHaveFarms: [],
-      plantHaveDiary: [],
+      createdPlantUsers: [],
+      notCreatedPlantUsers: [],
+      createdFarmUsers: [],
+      notCreatedFarmUsers: [],
+      haveOwnershipUsers: [],
+      notHaveOwnershipUsers: [],
       fetchingUser: false,
       inProgress: false,
       error: false
@@ -27,75 +29,69 @@ export default class UserStats extends Component {
   }
 
   componentDidMount() {
-    this.fetchUsers();
-    this.fetchUsersCreatedPlant();
-    this.fetchUsersHaveOnwership();
     this.fetchUserHasFarms();
-    this.fetchPlantsHaveLogDiares();
+    this.getUserInsight();
   }
 
-  fetchUsers() {
+  getUserInsight() {
     new Parse.Query(Parse.User)
       .limit(Number.MAX_SAFE_INTEGER)
+      .matches("username", /^(\+84)([3|5|7|8|9])([0-9]{8})\b/)
       .find({
         useMasterKey: true
       })
-      .then(
-        users => {
-          this.setState({ users });
-        },
-        error => {
-          console.error("Fetching users", error);
-          this.setState({ error: "Unable to fetch the users" });
-        }
-      );
-  }
+      .then(users => {
+        this.setState({ users });
+        new Parse.Query("Plant")
+          .containedIn("owner", users)
+          .distinct("owner")
+          .then(createdPlantUserPointers => {
+            const createdPlantUsers = users.filter(user =>
+              createdPlantUserPointers.some(
+                pointer => pointer.objectId === user.id
+              )
+            );
+            this.setState({ createdPlantUsers });
+            const notCreatedPlantUsers = users.filter(
+              user => !createdPlantUsers.includes(user)
+            );
+            this.setState({ notCreatedPlantUsers });
+          });
 
-  fetchUsersCreatedPlant() {
-    new Parse.Query("Plant")
-      .limit(Number.MAX_SAFE_INTEGER)
-      .include("owner")
-      .distinct("owner")
-      .then(
-        userHavePlants => this.setState({ userHavePlants }),
-        error => this.setState({ error: "Unable to fetch the plants" })
-      );
-  }
+        new Parse.Query("Farm")
+          .containedIn("owner", users)
+          .distinct("owner")
+          .then(createdFarmUserPointers => {
+            const createdFarmUsers = users.filter(user =>
+              createdFarmUserPointers.some(
+                pointer => pointer.objectId === user.id
+              )
+            );
+            this.setState({ createdFarmUsers });
 
-  fetchUsersHaveOnwership() {
-    new Parse.Query("PlantOwnership")
-      .limit(Number.MAX_SAFE_INTEGER)
-      .include("owner")
-      .distinct("owner")
-      .then(
-        userHaveOwnerships => this.setState({ userHaveOwnerships }),
-        error => this.setState({ error: "Unable to fetch the ownership" })
-      );
-  }
+            const notCreatedFarmUsers = users.filter(
+              user => !createdFarmUsers.includes(user)
+            );
+            this.setState({ notCreatedFarmUsers });
+          });
 
-  fetchUserHasFarms() {
-    new Parse.Query("Farm")
-      .limit(Number.MAX_SAFE_INTEGER)
-      .include("owner")
-      .distinct("owner")
-      .then(
-        userHaveFarms => this.setState({ userHaveFarms }),
-        error => this.setState({ error: "Unable to fetch the farms" })
-      );
-  }
+        new Parse.Query("PlantOwnership")
+          .containedIn("owner", users)
+          .distinct("owner")
+          .then(haveOwnershipUserPointers => {
+            const haveOwnershipUsers = users.filter(user =>
+              haveOwnershipUserPointers.some(
+                pointer => pointer.objectId === user.id
+              )
+            );
+            this.setState({ haveOwnershipUsers });
 
-  fetchPlantsHaveLogDiares() {
-    new Parse.Query("LogPlantDiary")
-      .limit(Number.MAX_SAFE_INTEGER)
-      .include("plant.owner")
-      .find({
-        useMasterKey: true
-      })
-      // .distinct("plant")
-      .then(
-        plantHaveDiary => this.setState({ plantHaveDiary }),
-        error => this.setState({ error: "Unable to fetch the plants" })
-      );
+            const notHaveOwnershipUsers = users.filter(
+              user => !haveOwnershipUsers.includes(user)
+            );
+            this.setState({ notHaveOwnershipUsers });
+          });
+      });
   }
 
   filterRealuser(user) {
@@ -105,59 +101,32 @@ export default class UserStats extends Component {
   render() {
     const {
       users,
-      userHavePlants,
-      userHaveOwnerships,
-      userHaveFarms,
-      plantHaveDiary
+      createdPlantUsers,
+      notCreatedPlantUsers,
+      createdFarmUsers,
+      notCreatedFarmUsers,
+      haveOwnershipUsers,
+      notHaveOwnershipUsers
     } = this.state;
-
-    const realUsers = users.filter(user => this.filterRealuser(user));
-
-    const realUserHavePlants = userHavePlants.filter(u =>
-      realUsers.find(r => r.id === u.objectId)
-    );
-    const usersHaveNoPlant = realUsers.filter(
-      u => !realUserHavePlants.find(p => p.objectId === u.id)
-    );
-
-    const realUserHaveOwnerships = userHaveOwnerships.filter(u =>
-      realUsers.find(r => r.id === u.objectId)
-    );
-    const realUserNoOwnerships = realUsers.filter(
-      u => !realUserHaveOwnerships.find(r => r.objectId === u.id)
-    );
-
-    const realUserHaveFarms = userHaveFarms.filter(u =>
-      realUsers.find(r => r.id === u.objectId)
-    );
-    const realUsersLogDiaries = plantHaveDiary
-      .filter(p =>
-        VN_PHONE_NUMBER_REGEX.test(
-          p
-            .get("plant")
-            .get("owner")
-            .get("username")
-        )
-      )
-      .map(p => p.get("plant").get("owner").id);
-
-    const uniqUsersLogDiaries = [...new Set(realUsersLogDiaries)];
-    const usersNoLogDiaries = realUsers.filter(
-      u => uniqUsersLogDiaries.indexOf(u.id) < 0
-    );
 
     return (
       <div style={{ padding: "30px 0 60px 0" }}>
         <Fieldset legend="User Insight" description="Excluding testing users">
           <Field
             label={<Label text="Total users" />}
-            input={<Button value={realUsers.length.toString()} color="blue" />}
+            input={<Button value={users.length.toString()} color="blue" />}
           ></Field>
           <Field
             label={<Label text="Users have at least one farm" />}
             input={
+              <Button value={createdFarmUsers.length.toString()} color="blue" />
+            }
+          ></Field>
+          <Field
+            label={<Label text="Users have never created any farm" />}
+            input={
               <Button
-                value={realUserHaveFarms.length.toString()}
+                value={notCreatedFarmUsers.length.toString()}
                 color="blue"
               />
             }
@@ -166,7 +135,7 @@ export default class UserStats extends Component {
             label={<Label text="Users have created at least one plant" />}
             input={
               <Button
-                value={realUserHavePlants.length.toString()}
+                value={createdPlantUsers.length.toString()}
                 color="blue"
               />
             }
@@ -174,14 +143,17 @@ export default class UserStats extends Component {
           <Field
             label={<Label text="Users have never created any plant" />}
             input={
-              <Button value={usersHaveNoPlant.length.toString()} color="blue" />
+              <Button
+                value={notCreatedPlantUsers.length.toString()}
+                color="blue"
+              />
             }
           ></Field>
           <Field
             label={<Label text="Users have at least one ownership" />}
             input={
               <Button
-                value={realUserHaveOwnerships.length.toString()}
+                value={haveOwnershipUsers.length.toString()}
                 color="blue"
               />
             }
@@ -192,25 +164,7 @@ export default class UserStats extends Component {
             }
             input={
               <Button
-                value={realUserNoOwnerships.length.toString()}
-                color="blue"
-              />
-            }
-          ></Field>
-          <Field
-            label={<Label text="Users have logged at least one diary" />}
-            input={
-              <Button
-                value={uniqUsersLogDiaries.length.toString()}
-                color="blue"
-              />
-            }
-          ></Field>
-          <Field
-            label={<Label text="Users have never logged any diary" />}
-            input={
-              <Button
-                value={usersNoLogDiaries.length.toString()}
+                value={notHaveOwnershipUsers.length.toString()}
                 color="blue"
               />
             }
