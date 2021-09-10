@@ -51,53 +51,53 @@ export default class DashboardView extends React.Component {
     }
 
     //webhooks requires removal of heroku link code, then it should work.
-    if (
-      features.hooks &&
-      features.hooks.create &&
-      features.hooks.read &&
-      features.hooks.update &&
-      features.hooks.delete
-    ) {
-      coreSubsections.push({
-        name: "Webhooks",
-        link: "/webhooks"
-      });
-    }
+    // if (
+    //   features.hooks &&
+    //   features.hooks.create &&
+    //   features.hooks.read &&
+    //   features.hooks.update &&
+    //   features.hooks.delete
+    // ) {
+    //   coreSubsections.push({
+    //     name: "Webhooks",
+    //     link: "/webhooks"
+    //   });
+    // }
 
-    if (features.cloudCode && features.cloudCode.jobs) {
-      coreSubsections.push({
-        name: "Jobs",
-        link: "/jobs"
-      });
-    }
+    // if (features.cloudCode && features.cloudCode.jobs) {
+    //   coreSubsections.push({
+    //     name: "Jobs",
+    //     link: "/jobs"
+    //   });
+    // }
 
-    if (
-      features.logs &&
-      Object.keys(features.logs).some(key => features.logs[key])
-    ) {
-      coreSubsections.push({
-        name: "Logs",
-        link: "/logs"
-      });
-    }
+    // if (
+    //   features.logs &&
+    //   Object.keys(features.logs).some(key => features.logs[key])
+    // ) {
+    //   coreSubsections.push({
+    //     name: "Logs",
+    //     link: "/logs"
+    //   });
+    // }
 
-    if (
-      features.globalConfig &&
-      features.globalConfig.create &&
-      features.globalConfig.read &&
-      features.globalConfig.update &&
-      features.globalConfig.delete
-    ) {
-      coreSubsections.push({
-        name: "Config",
-        link: "/config"
-      });
-    }
+    // if (
+    //   features.globalConfig &&
+    //   features.globalConfig.create &&
+    //   features.globalConfig.read &&
+    //   features.globalConfig.update &&
+    //   features.globalConfig.delete
+    // ) {
+    //   coreSubsections.push({
+    //     name: "Config",
+    //     link: "/config"
+    //   });
+    // }
 
-    coreSubsections.push({
-      name: "API Console",
-      link: "/api_console"
-    });
+    // coreSubsections.push({
+    //   name: "API Console",
+    //   link: "/api_console"
+    // });
 
     coreSubsections.push({
       name: "Statistics",
@@ -225,15 +225,15 @@ export default class DashboardView extends React.Component {
       });
     }
 
-    if (pushSubsections.length > 0) {
-      appSidebarSections.push({
-        name: "Push",
-        icon: "push-outline",
-        link: "/push",
-        style: { paddingLeft: "16px" },
-        subsections: pushSubsections
-      });
-    }
+    // if (pushSubsections.length > 0) {
+    //   appSidebarSections.push({
+    //     name: "Push",
+    //     icon: "push-outline",
+    //     link: "/push",
+    //     style: { paddingLeft: "16px" },
+    //     subsections: pushSubsections
+    //   });
+    // }
 
     if (analyticsSidebarSections.length > 0) {
       appSidebarSections.push({

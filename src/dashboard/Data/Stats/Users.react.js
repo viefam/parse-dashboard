@@ -22,6 +22,7 @@ export default class UserStats extends Component {
       notCreatedFarmUsers: [],
       haveOwnershipUsers: [],
       notHaveOwnershipUsers: [],
+      missedUsers: [],
       fetchingUser: false,
       inProgress: false,
       error: false
@@ -29,7 +30,6 @@ export default class UserStats extends Component {
   }
 
   componentDidMount() {
-    this.fetchUserHasFarms();
     this.getUserInsight();
   }
 
@@ -91,6 +91,21 @@ export default class UserStats extends Component {
             );
             this.setState({ notHaveOwnershipUsers });
           });
+
+        new Parse.Query("OTPHistory")
+          .notContainedIn(
+            "phoneNumber",
+            users.map(user => user.get("username"))
+          )
+          .greaterThan("createdAt", new Date("2021", "8", "8"))
+          .distinct("phoneNumber")
+          .then(mUsers => {
+            const missedUsers = mUsers.filter(user =>
+              VN_PHONE_NUMBER_REGEX.test(user)
+            );
+            this.setState({ missedUsers });
+            console.log("Missed users", missedUsers);
+          });
       });
   }
 
@@ -106,7 +121,8 @@ export default class UserStats extends Component {
       createdFarmUsers,
       notCreatedFarmUsers,
       haveOwnershipUsers,
-      notHaveOwnershipUsers
+      notHaveOwnershipUsers,
+      missedUsers
     } = this.state;
 
     return (
@@ -169,6 +185,12 @@ export default class UserStats extends Component {
               />
             }
           ></Field>
+          {/* <Field
+            label={<Label text="Missed Users" />}
+            input={
+              <Button value={missedUsers.length.toString()} color="blue" />
+            }
+          ></Field> */}
         </Fieldset>
       </div>
     );
