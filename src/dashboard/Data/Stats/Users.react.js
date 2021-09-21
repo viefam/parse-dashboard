@@ -5,6 +5,8 @@ import Label from "components/Label/Label.react";
 import TextInput from "components/TextInput/TextInput.react";
 import Button from "components/Button/Button.react";
 import styles from "dashboard/Data/Stats/Stats.scss";
+import ExportCsv, { DowloadCsv } from "./CsvUtils";
+
 import Parse from "parse";
 
 const VN_PHONE_NUMBER_REGEX = /^(\+84)([3|5|7|8|9])([0-9]{8})\b/;
@@ -23,14 +25,23 @@ export default class UserStats extends Component {
       haveOwnershipUsers: [],
       notHaveOwnershipUsers: [],
       missedUsers: [],
+      plantTypes: [],
       fetchingUser: false,
       inProgress: false,
       error: false
     };
+
+    this.exportCsv = this.exportCsv.bind(this);
   }
 
   componentDidMount() {
     this.getUserInsight();
+    this.getPlantTypes();
+  }
+
+  exportCsv(data, fileName = "data") {
+    const csv = ExportCsv({ data });
+    DowloadCsv(csv, fileName);
   }
 
   getUserInsight() {
@@ -109,6 +120,22 @@ export default class UserStats extends Component {
       });
   }
 
+  getPlantTypes() {
+    new Parse.Query("PlantType")
+      .exists("album")
+      .find({
+        useMasterKey: true
+      })
+      .then(types => {
+        const plantTypes = types.map(t => {
+          return {
+            name: t.get("name")
+          };
+        });
+        this.setState({ plantTypes });
+      });
+  }
+
   filterRealuser(user) {
     return VN_PHONE_NUMBER_REGEX.test(user.get("username"));
   }
@@ -122,7 +149,7 @@ export default class UserStats extends Component {
       notCreatedFarmUsers,
       haveOwnershipUsers,
       notHaveOwnershipUsers,
-      missedUsers
+      plantTypes
     } = this.state;
 
     return (
@@ -183,6 +210,18 @@ export default class UserStats extends Component {
                 value={notHaveOwnershipUsers.length.toString()}
                 color="blue"
               />
+            }
+          ></Field>
+          <Field
+            label={<Label text="Plant types have album" />}
+            input={
+              <div>
+                <Button
+                  value={plantTypes.length.toString()}
+                  color="blue"
+                  onClick={this.exportCsv.bind(this, plantTypes, "plantTypes")}
+                />
+              </div>
             }
           ></Field>
           {/* <Field
