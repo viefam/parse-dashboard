@@ -122,14 +122,17 @@ export default class UserStats extends Component {
 
   getPlantTypes() {
     new Parse.Query("PlantType")
-      .exists("album")
+      .limit(Number.MAX_SAFE_INTEGER)
+      .include("album")
       .find({
         useMasterKey: true
       })
       .then(types => {
         const plantTypes = types.map(t => {
           return {
-            name: t.get("name")
+            name: t.get("name"),
+            album: t.get("album"),
+            image: t.get("image")
           };
         });
         this.setState({ plantTypes });
@@ -152,6 +155,15 @@ export default class UserStats extends Component {
       plantTypes
     } = this.state;
 
+    const plantTypesHaveAlbum = plantTypes.filter(type => !!type.album);
+    const sortedNamePlantType = plantTypes
+      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+      .map(type => {
+        return {
+          name: type.name,
+          image: type.image || ""
+        };
+      });
     return (
       <div style={{ padding: "30px 0 60px 0" }}>
         <Fieldset legend="User Insight" description="Excluding testing users">
@@ -217,9 +229,29 @@ export default class UserStats extends Component {
             input={
               <div>
                 <Button
-                  value={plantTypes.length.toString()}
+                  value={plantTypesHaveAlbum.length.toString()}
                   color="blue"
-                  onClick={this.exportCsv.bind(this, plantTypes, "plantTypes")}
+                  onClick={this.exportCsv.bind(
+                    this,
+                    plantTypesHaveAlbum,
+                    "plantTypesHaveAlbum"
+                  )}
+                />
+              </div>
+            }
+          ></Field>
+          <Field
+            label={<Label text="All plant types (A -> Z)" />}
+            input={
+              <div>
+                <Button
+                  value={sortedNamePlantType.length.toString()}
+                  color="blue"
+                  onClick={this.exportCsv.bind(
+                    this,
+                    sortedNamePlantType,
+                    "plantTypes"
+                  )}
                 />
               </div>
             }
