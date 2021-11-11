@@ -11,6 +11,7 @@ import AnalyticsOverview from "./Analytics/Overview/Overview.react";
 import ApiConsole from "./Data/ApiConsole/ApiConsole.react";
 import Stats from "./Data/Stats/Stats.react";
 import UserStats from "./Data/Stats/Users.react";
+import Leaderboards from "./Data/Stats/Leaderboards.react";
 import AppData from "./AppData.react";
 import AppsIndex from "./Apps/AppsIndex.react";
 import AppsManager from "lib/AppsManager";
@@ -329,6 +330,14 @@ export default class Dashboard extends React.Component {
             <Stats {...props}>
               <UserStats />
             </Stats>
+          )}
+        />
+        <Route
+          path={props.match.path + "/leaderboards"}
+          render={props => (
+            // <Stats {...props}>
+            <Leaderboards />
+            // </Stats>
           )}
         />
         <Redirect from={props.match.path} to="/apps/:appId/stats/users" />
