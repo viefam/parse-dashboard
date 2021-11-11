@@ -1,12 +1,6 @@
 import React, { Component } from "react";
-import Field from "components/Field/Field.react";
-import Fieldset from "components/Fieldset/Fieldset.react";
-import Label from "components/Label/Label.react";
-import TextInput from "components/TextInput/TextInput.react";
-import Dropdown from "components/Dropdown/Dropdown.react";
 import ChromeDropdown from "components/ChromeDropdown/ChromeDropdown.react";
 import Option from "components/Dropdown/Option.react";
-import Button from "components/Button/Button.react";
 import EmptyState from "components/EmptyState/EmptyState.react";
 import Toolbar from "components/Toolbar/Toolbar.react";
 import SidebarAction from "components/Sidebar/SidebarAction";
@@ -95,13 +89,6 @@ export default class LeaderBoardsStats extends TableView {
           width="160px"
         />
       </div>
-      // <Dropdown
-      //   {...this.props}
-      //   value={metric}
-      //   onChange={this.handleMetricChange.bind(this)}
-      // >
-      //   {options}
-      // </Dropdown>
     );
   }
 
