@@ -3,6 +3,9 @@ import Field from "components/Field/Field.react";
 import Fieldset from "components/Fieldset/Fieldset.react";
 import Label from "components/Label/Label.react";
 import TextInput from "components/TextInput/TextInput.react";
+import Dropdown from "components/Dropdown/Dropdown.react";
+import ChromeDropdown from "components/ChromeDropdown/ChromeDropdown.react";
+import Option from "components/Dropdown/Option.react";
 import Button from "components/Button/Button.react";
 import EmptyState from "components/EmptyState/EmptyState.react";
 import Toolbar from "components/Toolbar/Toolbar.react";
@@ -20,71 +23,118 @@ export default class LeaderBoardsStats extends TableView {
 
     this.state = {
       response: { results: [] },
-      data: []
+      data: [],
+      metric: "users-create-most-plants"
     };
 
     this.exportCsv = this.exportCsv.bind(this);
+    this.renderMetricsDDL = this.renderMetricsDDL.bind(this);
   }
 
   componentDidMount() {
-    this.getUserCreateMostPlant();
+    const { metric } = this.state;
+    this.getUserCreateMostPlant(metric);
   }
 
-  getUserCreateMostPlant() {
+  getUserCreateMostPlant(metric) {
     Parse.Cloud.run(
       "getInsights",
       {
-        metric: "users-create-most-plants"
+        metric,
+        limit: 20
       },
       {
         useMasterKey: true
       }
     ).then(data => {
-      console.log("Users", data);
       this.setState({ data });
     });
   }
 
+  handleMetricChange(metric) {
+    this.setState({ metric });
+    this.getUserCreateMostPlant(metric);
+  }
+
   renderToolbar() {
+    const { metric } = this.state;
+    let metricType = metric
+      .split("-")
+      .pop()
+      .toUpperCase();
+
     return (
-      <Toolbar section="Insights" subsection="Leaderboards">
-        <Button
-          color="white"
-          value="Change metrics"
-          onClick={this.showMetrics.bind(this)}
-        />
+      <Toolbar section="Insights" subsection={`${metricType} Leaderboards`}>
+        {this.renderMetricsDDL()}
       </Toolbar>
+    );
+  }
+
+  renderMetricsDDL() {
+    const metrics = [
+      {
+        key: "users-create-most-plants",
+        value: "Plants"
+      },
+      {
+        key: "users-create-most-diaries",
+        value: "Diaries"
+      }
+    ];
+    const options = metrics.map(({ key, name }) => (
+      <Option value={key}>{name}</Option>
+    ));
+
+    return (
+      <div style={{ marginTop: "45px" }}>
+        <ChromeDropdown
+          placeholder={"Choose a metric"}
+          value={this.state.metric}
+          onChange={metric => this.handleMetricChange(metric)}
+          options={metrics}
+          width="160px"
+        />
+      </div>
+      // <Dropdown
+      //   {...this.props}
+      //   value={metric}
+      //   onChange={this.handleMetricChange.bind(this)}
+      // >
+      //   {options}
+      // </Dropdown>
     );
   }
 
   renderHeaders() {
     return [
-      <TableHeader key="count" width={15}>
+      <TableHeader key="count" width={10}>
         Count
       </TableHeader>,
       <TableHeader key="displayName" width={30}>
         Display Name
       </TableHeader>,
-      <TableHeader key="phone" width={30}>
+      <TableHeader key="phone" width={20}>
         Phone
       </TableHeader>,
-      <TableHeader key="address" width={15}>
+      <TableHeader key="address" width={40}>
         Address
       </TableHeader>
     ];
   }
 
   renderRow(data) {
+    const columnStyleSuperLarge = { width: "40%", cursor: "pointer" };
     const columnStyleLarge = { width: "30%", cursor: "pointer" };
-    const columnStyleSmall = { width: "15%", cursor: "pointer" };
+    const columnStyleMedium = { width: "20%", cursor: "pointer" };
+    const columnStyleSmall = { width: "10%", cursor: "pointer" };
 
     const { count, displayName, phone, address } = data;
     return (
       <tr key={phone}>
         <td style={columnStyleSmall}>{count}</td>
         <td style={columnStyleLarge}>{displayName}</td>
-        <td style={columnStyleLarge}>{phone}</td>
-        <td style={columnStyleSmall}>{address}</td>
+        <td style={columnStyleMedium}>{phone}</td>
+        <td style={columnStyleSuperLarge}>{address}</td>
       </tr>
     );
   }
@@ -112,10 +162,10 @@ export default class LeaderBoardsStats extends TableView {
     }
 
     return data.map(item => ({
-      count: item.plantCount,
-      displayName: item.owner.displayName,
-      phone: item.owner.phone,
-      address: item.address
+      count: item.count,
+      displayName: item.user.displayName,
+      phone: item.user.phone,
+      address: item.user.address
     }));
   }
 }
