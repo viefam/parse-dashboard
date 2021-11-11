@@ -11,6 +11,12 @@
       "appId": "FcpgYJsb89Tid8YgBmwaWeZvnmamBfym0oHarD7q",
       "masterKey": "PFdQKGowmOY0sHoznIX5e8QMeIzMKitqgD2NJDKm",
       "appName": "viefam"
+    },
+    {
+      "serverURL": "http://localhost:1337/viefam",
+      "appId": "viefam189",
+      "masterKey": "viefam189",
+      "appName": "local-viefam"
     }
   ],
   "iconsFolder": "icons"
