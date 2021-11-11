@@ -5,9 +5,9 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import React from "react";
 import CategoryList from "components/CategoryList/CategoryList.react";
 import DashboardView from "dashboard/DashboardView.react";
+import React from "react";
 
 export default class Stats extends DashboardView {
   constructor() {
@@ -25,6 +25,7 @@ export default class Stats extends DashboardView {
         linkPrefix={"stats/"}
         categories={[
           { name: "Users", id: "users" },
+          { name: "Leaderboards", id: "leaderboards" },
           { name: "Diaries", id: "diaries" },
           { name: "Logs", id: "logs" }
         ]}
