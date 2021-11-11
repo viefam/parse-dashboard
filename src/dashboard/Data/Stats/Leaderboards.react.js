@@ -73,6 +73,14 @@ export default class LeaderBoardsStats extends TableView {
       {
         key: "users-create-most-diaries",
         value: "Diaries"
+      },
+      {
+        key: "users-create-most-comments",
+        value: "Comments"
+      },
+      {
+        key: "users-create-most-posts",
+        value: "Posts"
       }
     ];
     const options = metrics.map(({ key, name }) => (
